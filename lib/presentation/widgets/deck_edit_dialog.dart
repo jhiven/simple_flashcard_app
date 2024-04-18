@@ -44,6 +44,7 @@ class DeckEditDialog extends StatelessWidget with CustomFormValidator {
                   child: TextFormField(
                     initialValue: deck?.title,
                     validator: (value) => validateIsNotEmpty(value, 'Title'),
+                    maxLength: 64,
                     decoration: const InputDecoration(
                       hintText: 'Title',
                       label: Text('Title'),

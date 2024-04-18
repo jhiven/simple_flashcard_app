@@ -85,14 +85,13 @@ class DeckCardOverviewBloc
   ) async {
     try {
       if (state.currentCard != null) {
-        await _cardItemRepository.updateCardItem(
+        await _cardItemRepository.nextCard(
           CardItemCompanion(
             id: Value(state.currentCard!.id),
             answeredType: const Value(AnswerType.easy),
             deckId: Value(state.currentCard!.deckId),
             front: Value(state.currentCard!.front),
             back: Value(state.currentCard!.back),
-            answeredAt: Value(DateTime.now()),
           ),
         );
         emit(

@@ -22,9 +22,25 @@ class $DeckTable extends Deck with TableInfo<$DeckTable, DeckData> {
   late final GeneratedColumn<String> title = GeneratedColumn<String>(
       'title', aliasedName, false,
       additionalChecks:
-          GeneratedColumn.checkTextLength(minTextLength: 0, maxTextLength: 32),
+          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 64),
       type: DriftSqlType.string,
       requiredDuringInsert: true);
+  static const VerificationMeta _cardTotalMeta =
+      const VerificationMeta('cardTotal');
+  @override
+  late final GeneratedColumn<int> cardTotal = GeneratedColumn<int>(
+      'card_total', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _cardLeftMeta =
+      const VerificationMeta('cardLeft');
+  @override
+  late final GeneratedColumn<int> cardLeft = GeneratedColumn<int>(
+      'card_left', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -34,7 +50,8 @@ class $DeckTable extends Deck with TableInfo<$DeckTable, DeckData> {
       requiredDuringInsert: false,
       clientDefault: () => DateTime.now());
   @override
-  List<GeneratedColumn> get $columns => [id, title, createdAt];
+  List<GeneratedColumn> get $columns =>
+      [id, title, cardTotal, cardLeft, createdAt];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -54,6 +71,14 @@ class $DeckTable extends Deck with TableInfo<$DeckTable, DeckData> {
     } else if (isInserting) {
       context.missing(_titleMeta);
     }
+    if (data.containsKey('card_total')) {
+      context.handle(_cardTotalMeta,
+          cardTotal.isAcceptableOrUnknown(data['card_total']!, _cardTotalMeta));
+    }
+    if (data.containsKey('card_left')) {
+      context.handle(_cardLeftMeta,
+          cardLeft.isAcceptableOrUnknown(data['card_left']!, _cardLeftMeta));
+    }
     if (data.containsKey('created_at')) {
       context.handle(_createdAtMeta,
           createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
@@ -71,6 +96,10 @@ class $DeckTable extends Deck with TableInfo<$DeckTable, DeckData> {
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       title: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
+      cardTotal: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}card_total'])!,
+      cardLeft: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}card_left'])!,
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
     );
@@ -85,14 +114,22 @@ class $DeckTable extends Deck with TableInfo<$DeckTable, DeckData> {
 class DeckData extends DataClass implements Insertable<DeckData> {
   final int id;
   final String title;
+  final int cardTotal;
+  final int cardLeft;
   final DateTime createdAt;
   const DeckData(
-      {required this.id, required this.title, required this.createdAt});
+      {required this.id,
+      required this.title,
+      required this.cardTotal,
+      required this.cardLeft,
+      required this.createdAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['title'] = Variable<String>(title);
+    map['card_total'] = Variable<int>(cardTotal);
+    map['card_left'] = Variable<int>(cardLeft);
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
@@ -101,6 +138,8 @@ class DeckData extends DataClass implements Insertable<DeckData> {
     return DeckCompanion(
       id: Value(id),
       title: Value(title),
+      cardTotal: Value(cardTotal),
+      cardLeft: Value(cardLeft),
       createdAt: Value(createdAt),
     );
   }
@@ -111,6 +150,8 @@ class DeckData extends DataClass implements Insertable<DeckData> {
     return DeckData(
       id: serializer.fromJson<int>(json['id']),
       title: serializer.fromJson<String>(json['title']),
+      cardTotal: serializer.fromJson<int>(json['cardTotal']),
+      cardLeft: serializer.fromJson<int>(json['cardLeft']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -120,13 +161,23 @@ class DeckData extends DataClass implements Insertable<DeckData> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'title': serializer.toJson<String>(title),
+      'cardTotal': serializer.toJson<int>(cardTotal),
+      'cardLeft': serializer.toJson<int>(cardLeft),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
 
-  DeckData copyWith({int? id, String? title, DateTime? createdAt}) => DeckData(
+  DeckData copyWith(
+          {int? id,
+          String? title,
+          int? cardTotal,
+          int? cardLeft,
+          DateTime? createdAt}) =>
+      DeckData(
         id: id ?? this.id,
         title: title ?? this.title,
+        cardTotal: cardTotal ?? this.cardTotal,
+        cardLeft: cardLeft ?? this.cardLeft,
         createdAt: createdAt ?? this.createdAt,
       );
   @override
@@ -134,53 +185,73 @@ class DeckData extends DataClass implements Insertable<DeckData> {
     return (StringBuffer('DeckData(')
           ..write('id: $id, ')
           ..write('title: $title, ')
+          ..write('cardTotal: $cardTotal, ')
+          ..write('cardLeft: $cardLeft, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, title, createdAt);
+  int get hashCode => Object.hash(id, title, cardTotal, cardLeft, createdAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is DeckData &&
           other.id == this.id &&
           other.title == this.title &&
+          other.cardTotal == this.cardTotal &&
+          other.cardLeft == this.cardLeft &&
           other.createdAt == this.createdAt);
 }
 
 class DeckCompanion extends UpdateCompanion<DeckData> {
   final Value<int> id;
   final Value<String> title;
+  final Value<int> cardTotal;
+  final Value<int> cardLeft;
   final Value<DateTime> createdAt;
   const DeckCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
+    this.cardTotal = const Value.absent(),
+    this.cardLeft = const Value.absent(),
     this.createdAt = const Value.absent(),
   });
   DeckCompanion.insert({
     this.id = const Value.absent(),
     required String title,
+    this.cardTotal = const Value.absent(),
+    this.cardLeft = const Value.absent(),
     this.createdAt = const Value.absent(),
   }) : title = Value(title);
   static Insertable<DeckData> custom({
     Expression<int>? id,
     Expression<String>? title,
+    Expression<int>? cardTotal,
+    Expression<int>? cardLeft,
     Expression<DateTime>? createdAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (title != null) 'title': title,
+      if (cardTotal != null) 'card_total': cardTotal,
+      if (cardLeft != null) 'card_left': cardLeft,
       if (createdAt != null) 'created_at': createdAt,
     });
   }
 
   DeckCompanion copyWith(
-      {Value<int>? id, Value<String>? title, Value<DateTime>? createdAt}) {
+      {Value<int>? id,
+      Value<String>? title,
+      Value<int>? cardTotal,
+      Value<int>? cardLeft,
+      Value<DateTime>? createdAt}) {
     return DeckCompanion(
       id: id ?? this.id,
       title: title ?? this.title,
+      cardTotal: cardTotal ?? this.cardTotal,
+      cardLeft: cardLeft ?? this.cardLeft,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -194,6 +265,12 @@ class DeckCompanion extends UpdateCompanion<DeckData> {
     if (title.present) {
       map['title'] = Variable<String>(title.value);
     }
+    if (cardTotal.present) {
+      map['card_total'] = Variable<int>(cardTotal.value);
+    }
+    if (cardLeft.present) {
+      map['card_left'] = Variable<int>(cardLeft.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -205,6 +282,8 @@ class DeckCompanion extends UpdateCompanion<DeckData> {
     return (StringBuffer('DeckCompanion(')
           ..write('id: $id, ')
           ..write('title: $title, ')
+          ..write('cardTotal: $cardTotal, ')
+          ..write('cardLeft: $cardLeft, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();

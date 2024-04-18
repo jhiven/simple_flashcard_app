@@ -31,6 +31,7 @@ class DeckEditBloc extends Bloc<DeckEditEvent, DeckEditState> {
     Emitter<DeckEditState> emit,
   ) async {
     try {
+      print(state.title);
       await _deckRepository.updateDeck(
         DeckCompanion(
           id: Value(event.deckId),
@@ -41,6 +42,7 @@ class DeckEditBloc extends Bloc<DeckEditEvent, DeckEditState> {
       emit(state.copyWith(status: DeckEditStatus.success));
     } catch (e) {
       emit(state.copyWith(status: DeckEditStatus.failure));
+      throw Exception(e.toString());
     }
   }
 

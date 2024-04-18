@@ -21,6 +21,7 @@ class DeckListBloc extends Bloc<DeckListEvent, DeckListState> {
     DeckListFetchRequested event,
     Emitter<DeckListState> emit,
   ) async {
+    await _deckRepository.getAllDecks();
     try {
       return emit.forEach(
         _deckRepository.watchAllDecks(),
@@ -34,6 +35,7 @@ class DeckListBloc extends Bloc<DeckListEvent, DeckListState> {
       );
     } catch (e) {
       emit(DeckListFailure(errorMsg: e.toString()));
+      throw Exception(e.toString());
     }
   }
 }

@@ -15,12 +15,3 @@ final class CardListRequested extends CardListEvent {
   @override
   List<Object> get props => [deckId];
 }
-
-final class CardListDeckRequested extends CardListEvent {
-  final int deckId;
-
-  const CardListDeckRequested({required this.deckId});
-
-  @override
-  List<Object> get props => [deckId];
-}

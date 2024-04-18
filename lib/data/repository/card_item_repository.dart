@@ -24,5 +24,7 @@ class CardItemRepository {
   Future<bool> updateCardItem(CardItemCompanion entry) =>
       _db.updateCardItem(entry);
 
+  Future<bool> nextCard(CardItemCompanion entry) => _db.nextCard(entry);
+
   Future<int> deleteCardItem(int id) => _db.deleteCardItem(id);
 }

@@ -16,7 +16,10 @@ class DeckListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text(deck.title),
+      title: Text(
+        deck.title,
+        overflow: TextOverflow.ellipsis,
+      ),
       trailing: IconButton(
         onPressed: () {
           context.read<DeckRepository>().deleteDeck(deck.id);

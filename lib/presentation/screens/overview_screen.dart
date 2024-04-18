@@ -64,10 +64,17 @@ class OverviewScreen extends StatelessWidget implements AutoRouteWrapper {
                         child: Padding(
                           key: ValueKey(state.currentCard!.id),
                           padding: const EdgeInsets.all(12),
-                          child: Flashcard(
-                            front: state.currentCard!.front,
-                            back: state.currentCard!.back,
-                            isOpen: state.isOpen,
+                          child: GestureDetector(
+                            onTap: () {
+                              context
+                                  .read<DeckCardOverviewBloc>()
+                                  .add(DeckCardOverviewOpen());
+                            },
+                            child: Flashcard(
+                              front: state.currentCard!.front,
+                              back: state.currentCard!.back,
+                              isOpen: state.isOpen,
+                            ),
                           ),
                         ),
                       ),

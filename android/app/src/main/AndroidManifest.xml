@@ -2,6 +2,8 @@
     <application
         android:label="simple_flashcard"
         android:name="${applicationName}"
+        android:allowBackup="false"
+        android:fullBackupOnly="false"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

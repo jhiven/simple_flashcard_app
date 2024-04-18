@@ -10,23 +10,20 @@ sealed class CardListState extends Equatable {
 final class CardListInitial extends CardListState {}
 
 final class CardListSuccess extends CardListState {
-  final DeckModel deck;
   final List<CardModel> cardList;
 
-  const CardListSuccess({required this.cardList, required this.deck});
+  const CardListSuccess({required this.cardList});
 
   CardListSuccess copyWith({
-    DeckModel? deck,
     List<CardModel>? cardList,
   }) {
     return CardListSuccess(
       cardList: cardList ?? this.cardList,
-      deck: deck ?? this.deck,
     );
   }
 
   @override
-  List<Object> get props => [cardList, deck];
+  List<Object> get props => [cardList];
 }
 
 final class CardListFailure extends CardListState {
